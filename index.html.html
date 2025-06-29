@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Numbers & Football Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 1rem;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 0.3rem;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.8rem;
+            background: transparent;
+            border: none;
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .balance-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 120px;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .daily-bonus {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .daily-bonus:hover {
+            transform: translateY(-2px);
+        }
+
+        .daily-bonus.claimed {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .bet-section {
+            margin-bottom: 2rem;
+        }
+
+        .bet-input {
+            padding: 0.8rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            width: 150px;
+            margin: 0 0.5rem;
+            text-align: center;
+        }
+
+        .numbers-section {
+            margin-bottom: 2rem;
+        }
+
+        .number-inputs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .number-input {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .number-input:focus {
+            outline: none;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .quick-pick {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-pick:hover {
+            transform: translateY(-1px);
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .play-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+
+        .winning-numbers {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .winning-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: bounceIn 0.6s ease;
+        }
+
+        .result-text {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .payout {
+            font-size: 2rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* Football Predictor Styles */
+        .matches-container {
+            margin-bottom: 2rem;
+        }
+
+        .match-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .match-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .match-time {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .league {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .team-flag {
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .vs {
+            font-size: 1.5rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .prediction-options {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .prediction-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .prediction-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .prediction-btn.selected {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border-color: #ffd700;
+        }
+
+        .prediction-btn.correct {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border-color: #28a745;
+        }
+
+        .prediction-btn.incorrect {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            border-color: #dc3545;
+        }
+
+        .match-result {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .badges-container {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .achievements {
+            text-align: left;
+        }
+
+        .achievement {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+        }
+
+        .achievement.locked {
+            border-left-color: #666;
+            opacity: 0.6;
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-title {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .achievement-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .achievement-progress {
+            font-size: 0.8rem;
+            color: #4ecdc4;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .leaderboard {
+            text-align: left;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .rules {
+            margin-top: 2rem;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .rules h3 {
+            margin-bottom: 0.5rem;
+            color: #ffd700;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            transform: translateX(300px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .generate-matches-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .generate-matches-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .win {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .balance-stats {
+                flex-direction: column;
+            }
+            
+            .teams {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .prediction-options {
+                flex-direction: column;
+            }
+            
+            .prediction-btn {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .number-inputs {
+                gap: 0.3rem;
+            }
+            
+            .number-input {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎲⚽ Gaming Hub</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('numbers')">🎲 Numbers</button>
+            <button class="tab" onclick="showTab('football')">⚽ Football</button>
+            <button class="tab" onclick="showTab('achievements')">🏆 Achievements</button>
+            <button class="tab" onclick="showTab('stats')">📊 Stats</button>
+        </div>
+
+        <!-- Numbers Game Tab -->
+        <div id="numbers" class="tab-content active">
+            <div class="balance-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="balance">10,000</div>
+                    <div class="stat-label">Balance (₦)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="level">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="winStreak">0</div>
+                    <div class="stat-label">Win Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="predictionPoints">0</div>
+                    <div class="stat-label">Prediction Points</div>
+                </div>
+            </div>
+
+            <div class="daily-bonus" id="dailyBonus" onclick="claimDailyBonus()">
+                <div>🎁 Daily Bonus Available!</div>
+                <div style="font-size: 0.9rem;">Click to claim ₦1,000 + 50 Prediction Points</div>
+            </div>
+
+            <div class="bet-section">
+                <label for="betAmount">Bet Amount (₦):</label><br>
+                <input type="number" id="betAmount" class="bet-input" value="100" min="100" max="1000">
+            </div>
+
+            <div class="numbers-section">
+                <h3>Choose your 5 lucky numbers (1-20):</h3>
+                <button class="quick-pick" onclick="quickPick()">🎲 Quick Pick</button>
+                <div class="number-inputs">
+                    <input type="number" class="number-input" id="num1" min="1" max="20" placeholder="?">
+                    <input type="number" class="number-input" id="num2" min="1" max="20" placeholder="?">
+                    <input type="number" class="number-input" id="num3" min="1" max="20" placeholder="?">
+                    <input type="number" class="number-input" id="num4" min="1" max="20" placeholder="?">
+                    <input type="number" class="number-input" id="num5" min="1" max="20" placeholder="?">
+                </div>
+            </div>
+
+            <button class="play-button" id="playButton" onclick="playNumbersGame()">
+                🎯 PLAY NOW
+            </button>
+
+            <div class="results" id="results">
+                <h3>Winning Numbers:</h3>
+                <div class="winning-numbers" id="winningNumbers"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="payout" id="payout"></div>
+            </div>
+
+            <div class="rules">
+                <h3>📋 Numbers Game Rules:</h3>
+                <p><strong>In Order Matches:</strong> 2 numbers: 5x, 3 numbers: 10x, 4 numbers: 20x, 5 numbers: 50x</p>
+                <p><strong>Out of Order:</strong> 1x + 1x per extra match</p>
+            </div>
+        </div>
+
+        <!-- Football Predictor Tab -->
+        <div id="football" class="tab-content">
+            <div class="balance-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="predictionPointsDisplay">0</div>
+                    <div class="stat-label">Prediction Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="correctPredictions">0</div>
+                    <div class="stat-label">Correct Predictions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="predictionStreak">0</div>
+                    <div class="stat-label">Prediction Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="predictionAccuracy">0</div>
+                    <div class="stat-label">Accuracy %</div>
+                </div>
+            </div>
+
+            <div class="badges-container" id="badgesContainer">
+                <!-- Badges will be added here -->
+            </div>
+
+            <button class="generate-matches-btn" onclick="generateMatches()">
+                ⚽ Generate New Matches
+            </button>
+
+            <div class="matches-container" id="matchesContainer">
+                <!-- Matches will be generated here -->
+            </div>
+
+            <button class="play-button" id="submitPredictions" onclick="submitPredictions()" style="display: none;">
+                🏆 Submit All Predictions
+            </button>
+
+            <div class="rules">
+                <h3>⚽ Football Predictor Rules:</h3>
+                <p><strong>Prediction Points:</strong></p>
+                <p>• Correct Result: +10 points</p>
+                <p>• Exact Score: +25 points</p>
+                <p>• Close Score (±1 goal): +15 points</p>
+                <p><strong>Badges:</strong> Unlock special badges for achievements!</p>
+            </div>
+        </div>
+
+        <!-- Achievements Tab -->
+        <div id="achievements" class="tab-content">
+            <h2>🏆 Achievements</h2>
+            <div id="achievementsList"></div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="stats" class="tab-content">
+            <h2>📊 Your Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h4>Games Played</h4>
+                    <div class="stat-value" id="gamesPlayed">0</div>
+                </div>
+                <div class="stat-item">
+                    <h4>Total Winnings</h4>
+                    <div class="stat-value">₦<span id="totalWinnings">0</span></div>
+                </div>
+                <div class="stat-item">
+                    <h4>Football Predictions</h4>
+                    <div class="stat-value" id="totalPredictions">0</div>
+                </div>
+                <div class="stat-item">
+                    <h4>Prediction Win Rate</h4>
+                    <div class="stat-value"><span id="predictionWinRate">0</span>%</div>
+                </div>
+                <div class="stat-item">
+                    <h4>Biggest Win</h4>
+                    <div class="stat-value">₦<span id="biggestWin">0</span></div>
+                </div>
+                <div class="stat-item">
+                    <h4>Days Active</h4>
+                    <div class="stat-value" id="daysPlayed">1</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Game state
+        let gameData = {
+            balance: 10000,
+            level: 1,
+            winStreak: 0,
+            totalWins: 0,
+            gamesPlayed: 0,
+            totalWinnings: 0,
+            biggestWin: 0,
+            lastDailyBonus: null,
+            achievements: {},
+            numberFrequency: {},
+            startDate: new Date().toDateString(),
+            
+            // Football predictor data
+            predictionPoints: 0,
+            correctPredictions: 0,
+            totalPredictions: 0,
+            predictionStreak: 0,
+            badges: [],
+            currentMatches: [],
+            predictions: {}
+        };
+
+        // Teams data
+        const teams = [
+            { name: "Arsenal", flag: "🔴" },
+            { name: "Chelsea", flag: "🔵" },
+            { name: "Man City", flag: "💙" },
+            { name: "Man United", flag: "🔴" },
+            { name: "Liverpool", flag: "❤️" },
+            { name: "Tottenham", flag: "⚪" },
+            { name: "Newcastle", flag: "⚫" },
+            { name: "Brighton", flag: "🔵" },
+            { name: "Aston Villa", flag: "🟣" },
+            { name: "West Ham", flag: "⚒️" },
+            { name: "Leicester", flag: "🦊" },
+            { name: "Everton", flag: "🔵" },
+            { name: "Crystal Palace", flag: "🦅" },
+            { name: "Wolves", flag: "🐺" },
+            { name: "Fulham", flag: "⚪" },
+            { name: "Brentford", flag: "🐝" }
+        ];
+
+        const leagues = ["Premier League", "Champions League", "FA Cup", "League Cup"];
+
+        // Badge definitions
+        const badges = [
+            { id: 'firstCorrect', name: 'First Strike', icon: '⚽', desc: 'First correct prediction' },
+            { id: 'streak3', name: 'Hat Trick', icon: '🎯', desc: '3 predictions in a row' },
+            { id: 'streak5', name: 'Unstoppable', icon: '🔥', desc: '5 predictions in a row' },
+            { id: 'exactScore', name: 'Perfectionist', icon: '🎪', desc: 'Predict exact score' },
+            { id: 'prediction50', name: 'Veteran', icon: '⭐', desc: '50 total predictions' },
+            { id: 'accuracy80', name: 'Sharp Shooter', icon: '🏹', desc: '80% accuracy (min 10 predictions)' }
+        ];
+
+        // Achievement definitions (expanded)
+        const achievements = [
+            { id: 'firstWin', title: 'First Victory', desc: 'Win your first numbers game', icon: '🎉', reward: 500 },
+            { id: 'winStreak5', title: 'Hot Streak', desc: 'Win 5 numbers games in a row', icon: '🔥', reward: 1000 },
+            { id: 'bigWin', title: 'Big Winner', desc: 'Win over ₦5,000 in a single numbers game', icon: '💰', reward: 2000 },
+            { id: 'hundredGames', title: 'Veteran Player', desc: 'Play 100 numbers games', icon: '🎮', reward: 3000 },
+            { id: 'jackpot', title: 'Jackpot Master', desc: 'Hit the 50x jackpot', icon: '🎰', reward: 5000 },
+            { id: 'dailyPlayer', title: 'Daily Grind', desc: 'Play for 7 days straight', icon: '📅', reward: 2500 },
+            { id: 'levelUp', title: 'Level Master', desc: 'Reach level 10', icon: '⭐', reward: 4000 },
+            { id: 'millionaire', title: 'Millionaire', desc: 'Accumulate ₦1,000,000 total winnings', icon: '👑', reward: 10000 },
+            
+            // Football predictor achievements
+            { id: 'firstPrediction', title: 'Football Debut', desc: 'Make your first football prediction', icon: '⚽', reward: 100 },
+            { id: 'predictionStreak10', title: 'Oracle', desc: 'Get 10 predictions in a row correct', icon: '🔮', reward: 2000 },
+            { id: 'exactScoreMaster', title: 'Score Prophet', desc: 'Predict 5 exact scores', icon: '🎯', reward: 1500 },
+            { id: 'predictionPoints1000', title: 'Points Master', desc: 'Earn 1000 prediction points', icon: '🏆', reward: 3000 }
+        ];
+
+        // Load and save functions
+        function loadGameData() {
+            const saved = localStorage.getItem('gamingHubData');
+            if (saved) {
+                gameData = { ...gameData, ...JSON.parse(saved) };
+            }
+        }
+
+        function saveGameData() {
+            localStorage.setItem('gamingHubData', JSON.stringify(gameData));
+        }
+
+        // Utility functions
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'achievements') {
+                renderAchievements();
+            } else if (tabName === 'stats') {
+                updateStats();
+            } else if (tabName === 'football') {
+                updateFootballDisplay();
+            }
+        }
+
+        function showNotification(message, duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+        function updateDisplay() {
+            document.getElementById('balance').textContent = gameData.balance.toLocaleString();
+            document.getElementById('level').textContent = gameData.level;
+            document.getElementById('winStreak').textContent = gameData.winStreak;
+            document.getElementById('predictionPoints').textContent = gameData.predictionPoints;
+        }
+
+        function updateFootballDisplay() {
+            document.getElementById('predictionPointsDisplay').textContent = gameData.predictionPoints;
+            document.getElementById('correctPredictions').textContent = gameData.correctPredictions;
+            document.getElementById('predictionStreak').textContent = gameData.predictionStreak;
+            
+            const accuracy = gameData.totalPredictions > 0 ? 
+                Math.round((gameData.correctPredictions / gameData.totalPredictions) * 100) : 0;
+            document.getElementById('predictionAccuracy').textContent = accuracy;
+            
+            renderBadges();
+        }
+
+        function updateStats() {
+            document.getElementById('gamesPlayed').textContent = gameData.gamesPlayed;
+            document.getElementById('totalWinnings').textContent = gameData.totalWinnings.toLocaleString();
+            document.getElementById('biggestWin').textContent = gameData.biggestWin.toLocaleString();
+            document.getElementById('totalPredictions').textContent = gameData.totalPredictions;
+            
+            const predictionWinRate = gameData.totalPredictions > 0 ? 
+                Math.round((gameData.correctPredictions / gameData.totalPredictions) * 100) : 0;
+            document.getElementById('predictionWinRate').textContent = predictionWinRate;
+
+            const startDate = new Date(gameData.startDate);
+            const today = new Date();
+            const daysPlayed = Math.max(1, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
+            document.getElementById('daysPlayed').textContent = daysPlayed;
+        }
+
+        function claimDailyBonus() {
+            const today = new Date().toDateString();
+            if (gameData.lastDailyBonus === today) return;
+
+            gameData.balance += 1000;
+            gameData.predictionPoints += 50;
+            gameData.lastDailyBonus = today;
+            
+            document.getElementById('dailyBonus').classList.add('claimed');
+            document.getElementById('dailyBonus').innerHTML = `
+                <div>✅ Daily Bonus Claimed!</div>
+                <div style="font-size: 0.9rem;">Come back tomorrow for more</div>
+            `;
+            
+            showNotification('🎁 Daily bonus claimed! +₦1,000 + 50 Prediction Points');
+            updateDisplay();
+            saveGameData();
+        }
+
+        // Numbers game functions (existing)
+        function quickPick() {
+            const numbers = [];
+            while (numbers.length < 5) {
+                const num = Math.floor(Math.random() * 20) + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`num${i + 1}`).value = numbers[i];
+            }
+        }
+
+        function generateWinningNumbers() {
+            const numbers = [];
+            for (let i = 0; i < 5; i++) {
+                numbers.push(Math.floor(Math.random() * 20) + 1);
+            }
+            return numbers;
+        }
+
+        function getUserNumbers() {
+            const numbers = [];
+            for (let i = 1; i <= 5; i++) {
+                const value = parseInt(document.getElementById(`num${i}`).value);
+                if (!value || value < 1 || value > 20) {
+                    return null;
+                }
+                numbers.push(value);
+            }
+            return numbers;
+        }
+
+        function calculatePayout(userNumbers, winningNumbers, betAmount) {
+            let inOrderMatches = 0;
+            let totalMatches = 0;
+
+            for (let i = 0; i < 5; i++) {
+                if (userNumbers[i] === winningNumbers[i]) {
+                    inOrderMatches++;
+                } else {
+                    break;
+                }
+            }
+
+            for (let userNum of userNumbers) {
+                if (winningNumbers.includes(userNum)) {
+                    totalMatches++;
+                }
+            }
+
+            let multiplier = 0;
+            let description = "";
+
+            if (inOrderMatches >= 2) {
+                if (inOrderMatches === 2) {
+                    multiplier = 5;
+                    description = "2 numbers in order! 5x payout!";
+                } else if (inOrderMatches === 3) {
+                    multiplier = 10;
+                    description = "3 numbers in order! 10x payout!";
+                } else if (inOrderMatches === 4) {
+                    multiplier = 20;
+                    description = "4 numbers in order! 20x payout!";
+                } else if (inOrderMatches === 5) {
+                    multiplier = 50;
+                    description = "🎉 JACKPOT! All 5 in order! 50x payout! 🎉";
+                }
+            } else if (totalMatches > 0) {
+                multiplier = totalMatches;
+                description = `${totalMatches} number${totalMatches > 1 ? 's' : ''} matched (out of order)! ${totalMatches}x payout!`;
+            } else {
+                description = "No matches this time. Better luck next round!";
+            }
+
+            return {
+                multiplier,
+                payout: betAmount * multiplier,
+                description,
+                inOrderMatches,
+                totalMatches
+            };
+        }
+
+        function playNumbersGame() {
+            const betAmount = parseInt(document.getElementById('betAmount').value);
+            const userNumbers = getUserNumbers();
+
+            if (!betAmount || betAmount < 100) {
+                alert('Please enter a bet amount of at least ₦100');
+                return;
+            }
+
+            if (betAmount > gameData.balance) {
+                alert('Insufficient balance!');
+                return;
+            }
+
+            if (!userNumbers) {
+                alert('Please enter all 5 numbers (1-20)');
+                return;
+            }
+
+            if (new Set(userNumbers).size !== userNumbers.length) {
+                alert('Please enter 5 different numbers');
+                return;
+            }
+
+            const playButton = document.getElementById('playButton');
+            playButton.disabled = true;
+            playButton.textContent = '🎲 Rolling...';
+
+            gameData.balance -= betAmount;
+            updateDisplay();
+
+            setTimeout(() => {
+                const winningNumbers = generateWinningNumbers();
+                const result = calculatePayout(userNumbers, winningNumbers, betAmount);
+
+                gameData.balance += result.payout;
+                updateGameStats(userNumbers, result, betAmount);
+                checkAchievements(result);
+
+                displayResults(winningNumbers, result);
+                updateDisplay();
+                saveGameData();
+
+                playButton.disabled = false;
+                playButton.textContent = '🎯 PLAY AGAIN';
+
+                if (gameData.balance < 100) {
+                    setTimeout(() => {
+                        const bonus = 5000 + (gameData.level * 1000);
+                        alert(`You're running low on funds! Here's ₦${bonus.toLocaleString()} bonus to keep playing!`);
+                        gameData.balance += bonus;
+                        updateDisplay();
+                        saveGameData();
+                    }, 2000);
+                }
+            }, 1500);
+        }
+
+        function updateGameStats(userNumbers, result, betAmount) {
+            gameData.gamesPlayed++;
+            
+            userNumbers.forEach(num => {
+                gameData.numberFrequency[num] = (gameData.numberFrequency[num] || 0) + 1;
+            });
+
+            if (result.payout > 0) {
+                gameData.totalWins++;
+                gameData.winStreak++;
+                gameData.totalWinnings += result.payout;
+                gameData.biggestWin = Math.max(gameData.biggestWin, result.payout);
+            } else {
+                gameData.winStreak = 0;
+            }
+
+            const newLevel = Math.floor(gameData.gamesPlayed / 10) + 1;
+            if (newLevel > gameData.level) {
+                gameData.level = newLevel;
+                const bonus = newLevel * 500;
+                gameData.balance += bonus;
+                showNotification(`🎉 Level Up! You're now level ${newLevel}! Bonus: ₦${bonus}`);
+            }
+        }
+
+        function displayResults(winningNumbers, result) {
+            const resultsDiv = document.getElementById('results');
+            const winningNumbersDiv = document.getElementById('winningNumbers');
+            const resultText = document.getElementById('resultText');
+            const payoutDiv = document.getElementById('payout');
+
+            winningNumbersDiv.innerHTML = '';
+
+            winningNumbers.forEach((num, index) => {
+                const numberDiv = document.createElement('div');
+                numberDiv.className = 'winning-number';
+                numberDiv.textContent = num;
+                numberDiv.style.animationDelay = `${index * 0.1}s`;
+                winningNumbersDiv.appendChild(numberDiv);
+            });
+
+            resultText.textContent = result.description;
+            
+            if (result.payout > 0) {
+                payoutDiv.textContent = `+₦${result.payout.toLocaleString()}`;
+                payoutDiv.className = 'payout win';
+            } else {
+                payoutDiv.textContent = `₦0`;
+                payoutDiv.className = 'payout';
+            }
+
+            resultsDiv.style.display = 'block';
+        }
+
+        // Football predictor functions
+        function generateMatches() {
+            const matches = [];
+            const numMatches = 5;
+            
+            for (let i = 0; i < numMatches; i++) {
+                const shuffledTeams = [...teams].sort(() => Math.random() - 0.5);
+                const homeTeam = shuffledTeams[0];
+                const awayTeam = shuffledTeams[1];
+                
+                const match = {
+                    id: `match_${Date.now()}_${i}`,
+                    homeTeam,
+                    awayTeam,
+                    league: leagues[Math.floor(Math.random() * leagues.length)],
+                    time: getRandomTime(),
+                    status: 'upcoming'
+                };
+                
+                matches.push(match);
+            }
+            
+            gameData.currentMatches = matches;
+            gameData.predictions = {};
+            renderMatches();
+            saveGameData();
+        }
+
+        function getRandomTime() {
+            const hours = Math.floor(Math.random() * 12) + 12; // 12-23 hours
+            const minutes = Math.random() < 0.5 ? '00' : '30';
+            return `${hours}:${minutes}`;
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('matchesContainer');
+            container.innerHTML = '';
+            
+            if (gameData.currentMatches.length === 0) {
+                container.innerHTML = '<p style="text-align: center; opacity: 0.7;">Click "Generate New Matches" to start predicting!</p>';
+                return;
+            }
+            
+            gameData.currentMatches.forEach(match => {
+                const matchDiv = document.createElement('div');
+                matchDiv.className = 'match-card';
+                matchDiv.innerHTML = createMatchHTML(match);
+                container.appendChild(matchDiv);
+            });
+            
+            updateSubmitButton();
+        }
+
+        function createMatchHTML(match) {
+            const isFinished = match.status === 'finished';
+            const prediction = gameData.predictions[match.id];
+            
+            return `
+                <div class="match-header">
+                    <div class="league">${match.league}</div>
+                    <div class="match-time">${match.time}</div>
+                </div>
+                
+                <div class="teams">
+                    <div class="team">
+                        <div class="team-flag">${match.homeTeam.flag}</div>
+                        <span>${match.homeTeam.name}</span>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="team">
+                        <span>${match.awayTeam.name}</span>
+                        <div class="team-flag">${match.awayTeam.flag}</div>
+                    </div>
+                </div>
+                
+                ${isFinished ? createResultHTML(match) : createPredictionHTML(match)}
+            `;
+        }
+
+        function createPredictionHTML(match) {
+            const prediction = gameData.predictions[match.id];
+            
+            return `
+                <div class="prediction-options">
+                    <button class="prediction-btn ${prediction === 'home' ? 'selected' : ''}" 
+                            onclick="makePrediction('${match.id}', 'home')">
+                        ${match.homeTeam.name} Win
+                    </button>
+                    <button class="prediction-btn ${prediction === 'draw' ? 'selected' : ''}" 
+                            onclick="makePrediction('${match.id}', 'draw')">
+                        Draw
+                    </button>
+                    <button class="prediction-btn ${prediction === 'away' ? 'selected' : ''}" 
+                            onclick="makePrediction('${match.id}', 'away')">
+                        ${match.awayTeam.name} Win
+                    </button>
+                </div>
+            `;
+        }
+
+        function createResultHTML(match) {
+            const prediction = gameData.predictions[match.id];
+            const result = match.result;
+            const isCorrect = prediction === result.outcome;
+            
+            return `
+                <div class="match-result">
+                    <div class="score">${match.homeTeam.name} ${result.homeScore} - ${result.awayScore} ${match.awayTeam.name}</div>
+                    <div style="color: ${isCorrect ? '#28a745' : '#dc3545'};">
+                        Your prediction: ${formatPrediction(prediction)} 
+                        ${isCorrect ? '✅ Correct!' : '❌ Incorrect'}
+                    </div>
+                    ${match.pointsEarned ? `<div style="color: #ffd700;">+${match.pointsEarned} points earned!</div>` : ''}
+                </div>
+            `;
+        }
+
+        function formatPrediction(prediction) {
+            switch(prediction) {
+                case 'home': return 'Home Win';
+                case 'away': return 'Away Win';
+                case 'draw': return 'Draw';
+                default: return 'No prediction';
+            }
+        }
+
+        function makePrediction(matchId, prediction) {
+            gameData.predictions[matchId] = prediction;
+            renderMatches();
+            updateSubmitButton();
+            saveGameData();
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitPredictions');
+            const upcomingMatches = gameData.currentMatches.filter(m => m.status === 'upcoming');
+            const predictions = Object.keys(gameData.predictions).length;
+            
+            if (upcomingMatches.length > 0 && predictions > 0) {
+                submitBtn.style.display = 'block';
+                submitBtn.textContent = `🏆 Submit ${predictions} Prediction${predictions > 1 ? 's' : ''}`;
+            } else {
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        function submitPredictions() {
+            const upcomingMatches = gameData.currentMatches.filter(m => m.status === 'upcoming');
+            let correctCount = 0;
+            let totalPoints = 0;
+            
+            upcomingMatches.forEach(match => {
+                if (gameData.predictions[match.id]) {
+                    // Generate random result
+                    const result = generateMatchResult();
+                    match.result = result;
+                    match.status = 'finished';
+                    
+                    const prediction = gameData.predictions[match.id];
+                    const isCorrect = prediction === result.outcome;
+                    
+                    if (isCorrect) {
+                        correctCount++;
+                        const points = 10; // Base points for correct prediction
+                        totalPoints += points;
+                        match.pointsEarned = points;
+                    }
+                }
+            });
+            
+            // Update stats
+            const totalPredictionsMade = upcomingMatches.filter(m => gameData.predictions[m.id]).length;
+            gameData.totalPredictions += totalPredictionsMade;
+            gameData.correctPredictions += correctCount;
+            gameData.predictionPoints += totalPoints;
+            
+            if (correctCount > 0) {
+                gameData.predictionStreak += correctCount;
+            } else {
+                gameData.predictionStreak = 0;
+            }
+            
+            // Check for badges and achievements
+            checkFootballAchievements(correctCount, totalPredictionsMade);
+            
+            // Show results
+            renderMatches();
+            updateFootballDisplay();
+            saveGameData();
+            
+            showNotification(`🎯 Results: ${correctCount}/${totalPredictionsMade} correct! +${totalPoints} points`);
+            
+            // Hide submit button
+            document.getElementById('submitPredictions').style.display = 'none';
+        }
+
+        function generateMatchResult() {
+            const outcomes = ['home', 'draw', 'away'];
+            const weights = [0.4, 0.25, 0.35]; // Slight home advantage
+            
+            const random = Math.random();
+            let cumulative = 0;
+            
+            for (let i = 0; i < outcomes.length; i++) {
+                cumulative += weights[i];
+                if (random <= cumulative) {
+                    const homeScore = Math.floor(Math.random() * 4);
+                    let awayScore = Math.floor(Math.random() * 4);
+                    
+                    // Adjust scores based on outcome
+                    if (outcomes[i] === 'home' && homeScore <= awayScore) {
+                        homeScore = awayScore + 1;
+                    } else if (outcomes[i] === 'away' && awayScore <= homeScore) {
+                        awayScore = homeScore + 1;
+                    } else if (outcomes[i] === 'draw' && homeScore !== awayScore) {
+                        awayScore = homeScore;
+                    }
+                    
+                    return {
+                        outcome: outcomes[i],
+                        homeScore,
+                        awayScore
+                    };
+                }
+            }
+            
+            return { outcome: 'draw', homeScore: 1, awayScore: 1 };
+        }
+
+        function checkFootballAchievements(correctCount, totalPredictionsMade) {
+            // Check for new badges
+            if (!gameData.badges.includes('firstCorrect') && gameData.correctPredictions >= 1) {
+                gameData.badges.push('firstCorrect');
+                showNotification('🏅 Badge Unlocked: First Strike!');
+            }
+            
+            if (!gameData.badges.includes('streak3') && gameData.predictionStreak >= 3) {
+                gameData.badges.push('streak3');
+                showNotification('🏅 Badge Unlocked: Hat Trick!');
+            }
+            
+            if (!gameData.badges.includes('streak5') && gameData.predictionStreak >= 5) {
+                gameData.badges.push('streak5');
+                showNotification('🏅 Badge Unlocked: Unstoppable!');
+            }
+            
+            if (!gameData.badges.includes('prediction50') && gameData.totalPredictions >= 50) {
+                gameData.badges.push('prediction50');
+                showNotification('🏅 Badge Unlocked: Veteran!');
+            }
+            
+            if (!gameData.badges.includes('accuracy80') && gameData.totalPredictions >= 10) {
+                const accuracy = (gameData.correctPredictions / gameData.totalPredictions) * 100;
+                if (accuracy >= 80) {
+                    gameData.badges.push('accuracy80');
+                    showNotification('🏅 Badge Unlocked: Sharp Shooter!');
+                }
+            }
+        }
+
+        function renderBadges() {
+            const container = document.getElementById('badgesContainer');
+            container.innerHTML = '';
+            
+            if (gameData.badges.length === 0) {
+                container.innerHTML = '<p style="opacity: 0.7; font-size: 0.9rem;">Make predictions to unlock badges!</p>';
+                return;
+            }
+            
+            gameData.badges.forEach(badgeId => {
+                const badge = badges.find(b => b.id === badgeId);
+                if (badge) {
+                    const badgeDiv = document.createElement('div');
+                    badgeDiv.className = 'badge';
+                    badgeDiv.innerHTML = `${badge.icon} ${badge.name}`;
+                    badgeDiv.title = badge.desc;
+                    container.appendChild(badgeDiv);
+                }
+            });
+        }
+
+        function checkAchievements(result) {
+            const newAchievements = [];
+
+            // Numbers game achievements
+            if (!gameData.achievements.firstWin && result.payout > 0) {
+                gameData.achievements.firstWin = true;
+                newAchievements.push('firstWin');
+            }
+
+            if (!gameData.achievements.winStreak5 && gameData.winStreak >= 5) {
+                gameData.achievements.winStreak5 = true;
+                newAchievements.push('winStreak5');
+            }
+
+            if (!gameData.achievements.bigWin && result.payout >= 5000) {
+                gameData.achievements.bigWin = true;
+                newAchievements.push('bigWin');
+            }
+
+            if (!gameData.achievements.hundredGames && gameData.gamesPlayed >= 100) {
+                gameData.achievements.hundredGames = true;
+                newAchievements.push('hundredGames');
+            }
+
+            if (!gameData.achievements.jackpot && result.multiplier === 50) {
+                gameData.achievements.jackpot = true;
+                newAchievements.push('jackpot');
+            }
+
+            if (!gameData.achievements.levelUp && gameData.level >= 10) {
+                gameData.achievements.levelUp = true;
+                newAchievements.push('levelUp');
+            }
+
+            if (!gameData.achievements.millionaire && gameData.totalWinnings >= 1000000) {
+                gameData.achievements.millionaire = true;
+                newAchievements.push('millionaire');
+            }
+
+            // Football predictor achievements
+            if (!gameData.achievements.firstPrediction && gameData.totalPredictions >= 1) {
+                gameData.achievements.firstPrediction = true;
+                newAchievements.push('firstPrediction');
+            }
+
+            if (!gameData.achievements.predictionStreak10 && gameData.predictionStreak >= 10) {
+                gameData.achievements.predictionStreak10 = true;
+                newAchievements.push('predictionStreak10');
+            }
+
+            if (!gameData.achievements.predictionPoints1000 && gameData.predictionPoints >= 1000) {
+                gameData.achievements.predictionPoints1000 = true;
+                newAchievements.push('predictionPoints1000');
+            }
+
+            // Award achievement rewards
+            newAchievements.forEach(achievementId => {
+                const achievement = achievements.find(a => a.id === achievementId);
+                if (achievement) {
+                    gameData.balance += achievement.reward;
+                    showNotification(`🏆 Achievement Unlocked: ${achievement.title}! +₦${achievement.reward}`);
+                }
+            });
+
+            return newAchievements.length > 0;
+        }
+
+        function renderAchievements() {
+            const container = document.getElementById('achievementsList');
+            container.innerHTML = '';
+
+            achievements.forEach(achievement => {
+                const div = document.createElement('div');
+                div.className = `achievement ${gameData.achievements[achievement.id] ? '' : 'locked'}`;
+                
+                let progress = '';
+                if (!gameData.achievements[achievement.id]) {
+                    switch (achievement.id) {
+                        case 'winStreak5':
+                            progress = `(${gameData.winStreak}/5)`;
+                            break;
+                        case 'hundredGames':
+                            progress = `(${gameData.gamesPlayed}/100)`;
+                            break;
+                        case 'levelUp':
+                            progress = `(Level ${gameData.level}/10)`;
+                            break;
+                        case 'predictionStreak10':
+                            progress = `(${gameData.predictionStreak}/10)`;
+                            break;
+                        case 'predictionPoints1000':
+                            progress = `(${gameData.predictionPoints}/1000)`;
+                            break;
+                    }
+                }
+
+                div.innerHTML = `
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-info">
+                        <div class="achievement-title">${achievement.title}</div>
+                        <div class="achievement-desc">${achievement.desc}</div>
+                        <div class="achievement-progress">${progress}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Initialize
+        function init() {
+            loadGameData();
+            updateDisplay();
+            updateFootballDisplay();
+            updateStats();
+
+            // Check daily bonus
+            const today = new Date().toDateString();
+            if (gameData.lastDailyBonus === today) {
+                document.getElementById('dailyBonus').classList.add('claimed');
+                document.getElementById('dailyBonus').innerHTML = `
+                    <div>✅ Daily Bonus Claimed!</div>
+                    <div style="font-size: 0.9rem;">Come back tomorrow for more</div>
+                `;
+            }
+
+            // Auto-focus next input
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`num${i}`).addEventListener('input', function() {
+                    if (this.value && i < 5) {
+                        document.getElementById(`num${i + 1}`).focus();
+                    }
+                });
+            }
+
+            // Limit bet amount to balance
+            document.getElementById('betAmount').addEventListener('input', function() {
+                const maxBet = Math.min(gameData.balance, 1000);
+                if (this.value > maxBet) {
+                    this.value = maxBet;
+                }
+            });
+
+            // Render existing matches if any
+            if (gameData.currentMatches && gameData.currentMatches.length > 0) {
+                renderMatches();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
